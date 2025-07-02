@@ -33,10 +33,11 @@ app.post('/api/send-snap', async (req, res) => {
         subject: 'Here’s your Snap!',
         html: `<p>${message || 'Enjoy your photo!'}</p>`,
         attachments: attachments.map((snap, index) => ({
-          filename: snap.filename || `snap_${index + 1}.png`,
-          content: snap.content,
-          encoding: 'base64',
-        })),
+            filename: snap.filename || `snap_${index + 1}.png`,
+            content: snap.content,
+            encoding: 'base64',
+            contentType: 'image/png'
+          }))
       });
     }
 
