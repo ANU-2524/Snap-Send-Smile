@@ -52,7 +52,7 @@ const handleSend = async () => {
         : null;
 
       return {
-        filename: `${snap.name}.png`,
+        filename: `${snap.name}${typeof snap.url === 'string' && snap.url.startsWith('data:image/gif') ? '.gif' : '.png'}` ,
         content: base64Part,
         encoding: 'base64',
       };
@@ -145,35 +145,48 @@ const handleSend = async () => {
           </div>
 
           <div style={{ marginTop: '30px' }}>
-            <h3>📜 Snap History</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-              {snapHistory.map((snap, idx) => (
-                <div key={idx} style={{ border: '1px solid #ccc', padding: '10px' }}>
-                  <strong>{snap.name}</strong>
-                  <br />
-                  <img
-                    src={snap.url}
-                    alt={snap.name}
-                    width="150"
-                    style={{ filter: getFilterCSS(snap.filter) }}
-                  />
-                  <br />
-                  <a
-                    href={snap.url}
-                    download={`${snap.name}.png`}
-                    style={{ marginRight: '10px' }}
-                  >
-                    📥 Download
-                  </a>
-                  <button onClick={() => {
-                    const updated = [...snapHistory];
-                    updated.splice(idx, 1);
-                    setSnapHistory(updated);
-                  }}>❌ Delete</button>
-                </div>
-              ))}
-            </div>
-          </div>
+  <h3>📜 Snap History</h3>
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+    {snapHistory.map((snap, idx) => {
+     const isGIF = typeof snap.url === 'string' && snap.url.startsWith('data:image/gif');
+      return (
+        <div key={idx} style={{ border: '1px solid #ccc', padding: '10px' }}>
+          <strong>{snap.name}</strong>
+          <br />
+          {isGIF ? (
+            <img
+              src={snap.url}
+              alt={snap.name}
+              width="150"
+              style={{ filter: getFilterCSS(snap.filter) }}
+            />
+          ) : (
+            <img
+              src={snap.url}
+              alt={snap.name}
+              width="150"
+              style={{ filter: getFilterCSS(snap.filter) }}
+            />
+          )}
+          <br />
+          <a
+            href={snap.url}
+            download={`${snap.name}${isGIF ? '.gif' : '.png'}`}
+            style={{ marginRight: '10px' }}
+          >
+            📥 Download
+          </a>
+          <button onClick={() => {
+            const updated = [...snapHistory];
+            updated.splice(idx, 1);
+            setSnapHistory(updated);
+          }}>❌ Delete</button>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
         </>
       )}
     </div>

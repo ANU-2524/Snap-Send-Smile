@@ -5,10 +5,16 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: ['https://snap-send-smile.vercel.app'],
+  origin: [
+    'https://snap-send-smile.vercel.app',
+    'http://localhost:5173'  // Allow dev environment
+  ],
   methods: ['GET', 'POST'],
+  credentials: true
 }));
 app.use(express.json({ limit: '20mb' }));
+
+
 
 app.post('/api/send-snap', async (req, res) => {
   const { emails, message, attachments } = req.body;
@@ -47,6 +53,7 @@ app.post('/api/send-snap', async (req, res) => {
     res.status(500).json({ success: false, msg: 'Server error while sending email.' });
   }
 });
+
 
 const PORT = 5566;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
