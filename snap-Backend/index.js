@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '20mb' }));
 
 app.post('/api/send-snap', async (req, res) => {
   const { email, image, message } = req.body;
