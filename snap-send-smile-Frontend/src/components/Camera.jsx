@@ -43,33 +43,32 @@ const Camera = ({ onCapture, selectedFilter }) => {
     }, 1000);
   };
 
-  const capturePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
+const capturePhoto = () => {
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  const context = canvas.getContext('2d');
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
 
-    // apply filter
-    context.filter = getFilterCSS(selectedFilter);
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  context.filter = getFilterCSS(selectedFilter);
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const dataURL = canvas.toDataURL('image/png');
+  const dataURL = canvas.toDataURL('image/png');
 
-    // Manage counter from localStorage
-    let snapCounter = Number(localStorage.getItem('snapCounter')) || 1;
-    const snapName = `Snap_${String(snapCounter).padStart(2, '0')}`;
-    localStorage.setItem('snapCounter', snapCounter + 1);
+  let snapCounter = Number(localStorage.getItem('snapCounter')) || 1;
+  const snapName = `Snap_${String(snapCounter).padStart(2, '0')}`;
+  localStorage.setItem('snapCounter', snapCounter + 1);
 
-    const snapObj = {
-      name: snapName,
-      url: dataURL,
-      filter: selectedFilter,
-    };
-
-    onCapture(snapObj);
+  const snapObj = {
+    name: snapName,
+    url: dataURL,
+    filter: selectedFilter,
   };
+
+  onCapture(snapObj);
+};
+
 
   const getFilterCSS = (filter) => {
     switch (filter) {

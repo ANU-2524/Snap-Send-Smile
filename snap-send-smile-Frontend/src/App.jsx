@@ -31,39 +31,47 @@ function App() {
     setSnapHistory(prev => [snapObj, ...prev]);
   };
 
-  const handleSend = async () => {
-    if (!email || snapHistory.length === 0)
-      return alert('Please enter emails and take at least one snap!');
+const handleSend = async () => {
+  if (!email || snapHistory.length === 0)
+    return alert('Please enter emails and take at least one snap!');
 
-    const emailList = email
-      .split(',')
-      .map(e => e.trim())
-      .filter(e => /\S+@\S+\.\S+/.test(e));
+  const emailList = email
+    .split(',')
+    .map(e => e.trim())
+    .filter(e => /\S+@\S+\.\S+/.test(e));
 
-    if (emailList.length === 0)
-      return alert("Enter at least one valid email!");
+  if (emailList.length === 0)
+    return alert("Enter at least one valid email!");
 
-    try {
-      setStatus('Sending...');
-      const attachments = snapHistory.map((snap) => ({
+  try {
+    setStatus('Sending...');
+
+    const attachments = snapHistory.map((snap) => {
+      const base64Part = typeof snap.url === 'string' && snap.url.includes('base64,')
+        ? snap.url.split('base64,')[1]
+        : null;
+
+      return {
         filename: `${snap.name}.png`,
-        content: snap.url.split("base64,")[1],
+        content: base64Part,
         encoding: 'base64',
-      }));
+      };
+    }).filter(Boolean); // Remove invalid snaps
 
-      const res = await fetch('https://snap-send-smile-w2ts.onrender.com/api/send-snap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emails: emailList, message, attachments })
-      });
+    const res = await fetch('https://snap-send-smile-w2ts.onrender.com/api/send-snap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emails: emailList, message, attachments }),
+    });
 
-      const data = await res.json();
-      setStatus(data.success ? '✅ All snaps sent!' : '❌ Failed to send.');
-    } catch (err) {
-      console.error(err);
-      setStatus('❌ Server error.');
-    }
-  };
+    const data = await res.json();
+    setStatus(data.success ? '✅ All snaps sent!' : '❌ Failed to send.');
+  } catch (err) {
+    console.error(err);
+    setStatus('❌ Server error.');
+  }
+};
+
 
   const handleLogout = () => {
     signOutUser();
