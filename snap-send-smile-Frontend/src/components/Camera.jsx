@@ -17,31 +17,42 @@ const Camera = ({ onCapture, selectedFilter }) => {
   const canvasRef = useRef(null);
   const [stream, setStream] = useState(null);
 
-  const startCamera = async (facing = 'environment') => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
+const startCamera = async (facing = 'environment') => {
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
 
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: facing } },
-        audio: true,
-      });
-
-      videoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
-    } catch (err) {
-      console.error("Camera error:", err);
-      alert("Couldn't access camera. Try allowing permission or use HTTPS.");
-    }
+  const constraints = {
+    video: { facingMode: { exact: facing } },
+    audio: true,
   };
 
-  useEffect(() => {
-    startCamera(facingMode);
-    return () => {
-      if (stream) stream.getTracks().forEach((track) => track.stop());
-    };
-  }, [facingMode]);
+  try {
+    const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    videoRef.current.srcObject = mediaStream;
+    setStream(mediaStream);
+  } catch (err) {
+    console.error("Primary camera access failed:", err);
+
+    try {
+      // fallback to any available camera
+      const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      videoRef.current.srcObject = fallbackStream;
+      setStream(fallbackStream);
+    } catch (fallbackErr) {
+      console.error("Fallback camera also failed:", fallbackErr);
+      alert("Camera access failed. Please allow camera permissions or refresh the browser.");
+    }
+  }
+};
+
+
+useEffect(() => {
+  startCamera(facingMode);
+  return () => {
+    if (stream) stream.getTracks().forEach((track) => track.stop());
+  };
+}, [facingMode]);
 
   const getFilterCSS = (filter) => {
     switch (filter) {
