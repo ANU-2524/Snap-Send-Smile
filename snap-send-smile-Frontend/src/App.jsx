@@ -15,27 +15,35 @@ function App() {
     setCapturedImage(imageData);
   };
 
-  const handleSend = async () => {
-    if (!email || !capturedImage) return alert('Please enter email and take a snap!');
+const handleSend = async () => {
+  if (!email || !capturedImage) return alert('Please enter emails and take a snap!');
 
-    try {
-      setStatus('Sending...');
-      const res = await fetch('http://localhost:5566/api/send-snap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, image: capturedImage, message }),
-      });
+  const emailList = email
+    .split(',')
+    .map(e => e.trim())
+    .filter(e => /\S+@\S+\.\S+/.test(e)); // simple regex
 
-      const data = await res.json();
-      if (data.success) {
-        setStatus('✅ Sent successfully!');
-      } else {
-        setStatus('❌ Failed to send.');
-      }
-    } catch (err) {
-      setStatus('❌ Server error.');
+  if (emailList.length === 0) return alert("Enter at least one valid email!");
+
+  try {
+    setStatus('Sending...');
+    const res = await fetch('http://localhost:5566/api/send-snap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emails: emailList, image: capturedImage, message }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setStatus('✅ Sent successfully!');
+    } else {
+      setStatus('❌ Failed to send.');
     }
-  };
+  } catch (err) {
+    setStatus('❌ Server error.');
+  }
+};
+
 
   return (
     <div style={{ padding: '20px' }}>
@@ -52,11 +60,12 @@ function App() {
 
           <div style={{ marginTop: '20px' }}>
             <input
-              type="email"
-              placeholder="Enter recipient's email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+                type="text"
+                placeholder="Enter recipient emails (comma-separated)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <small>Example: friend1@gmail.com, friend2@yahoo.com</small>
             <br /><br />
             <textarea
               rows="4"
