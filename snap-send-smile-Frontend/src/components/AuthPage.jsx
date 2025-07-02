@@ -1,0 +1,89 @@
+// src/components/AuthPage.jsx
+import React, { useState } from "react";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth } from "../firebase";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import "../Style/AuthPage.css";
+
+const provider = new GoogleAuthProvider();
+
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+      navigate(from);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+      navigate(from);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h2>{isLogin ? "Login to SnapSendSmile" : "Sign Up for SnapSendSmile"}</h2>
+
+        <input
+          type="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Enter Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+
+        <p className="toggle-auth">
+          {isLogin ? "Don't have an account?" : "Already registered?"}
+          <span onClick={() => setIsLogin(!isLogin)}>
+            {isLogin ? " Sign Up" : " Login"}
+          </span>
+        </p>
+      </form>
+
+      <div className="google-auth-container">
+        <button className="google-btn" onClick={handleGoogleLogin}>
+          <FcGoogle size={20} style={{ marginRight: "8px" }} />
+          Sign in with Google
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
