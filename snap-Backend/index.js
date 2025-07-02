@@ -8,11 +8,10 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 
 app.post('/api/send-snap', async (req, res) => {
-  const { emails, image, message } = req.body;
+  const { emails, message, attachments } = req.body;
 
-  // Validate input
-  if (!emails || !Array.isArray(emails) || emails.length === 0 || !image) {
-    return res.status(400).json({ success: false, msg: 'Missing fields or invalid data' });
+  if (!emails || !attachments || attachments.length === 0) {
+    return res.status(400).json({ success: false, msg: 'Missing fields' });
   }
 
   try {
@@ -24,20 +23,17 @@ app.post('/api/send-snap', async (req, res) => {
       },
     });
 
-    // Send email to each recipient
     for (const email of emails) {
       await transporter.sendMail({
         from: `"SnapSendSmile 📸" <${process.env.EMAIL}>`,
         to: email,
         subject: 'Here’s your Snap!',
         html: `<p>${message || 'Enjoy your photo!'}</p>`,
-        attachments: [
-          {
-            filename: 'snap.png',
-            content: image.split("base64,")[1],
-            encoding: 'base64',
-          },
-        ],
+        attachments: attachments.map((snap, index) => ({
+          filename: snap.filename || `snap_${index + 1}.png`,
+          content: snap.content,
+          encoding: 'base64',
+        })),
       });
     }
 
