@@ -91,20 +91,23 @@ const Camera = ({ onCapture, selectedFilter }) => {
     gif.render();
   };
 
-  const startCamera = async (deviceId) => {
-    if (stream) stream.getTracks().forEach(track => track.stop());
+const startCamera = async (deviceId) => {
+  if (stream) stream.getTracks().forEach(track => track.stop());
 
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: deviceId } },
-        audio: true,
-      });
-      videoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
-    } catch (err) {
-      console.error('Error starting camera:', err);
-    }
-  };
+  try {
+    const constraints = deviceId
+      ? { video: { deviceId: { exact: deviceId } }, audio: true }
+      : { video: { facingMode: { exact: "environment" } }, audio: true }; // rear camera
+
+    const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+    videoRef.current.srcObject = mediaStream;
+    setStream(mediaStream);
+  } catch (err) {
+    console.error('Error starting camera:', err);
+    alert("Failed to access the camera. Please check permissions and HTTPS.");
+  }
+};
 
   useEffect(() => {
     loadDevices();
@@ -116,7 +119,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
   }, []);
 
   useEffect(() => {
-    if (selectedDeviceId) startCamera(selectedDeviceId);
+   startCamera(selectedDeviceId); 
   }, [selectedDeviceId]);
 
   const handleDeviceChange = (e) => {
