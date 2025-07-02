@@ -51,7 +51,7 @@ function App() {
         encoding: 'base64',
       }));
 
-      const res = await fetch('http://localhost:5566/api/send-snap', {
+      const res = await fetch('https://snap-send-smile-w2ts.onrender.com/api/send-snap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emails: emailList, message, attachments })
