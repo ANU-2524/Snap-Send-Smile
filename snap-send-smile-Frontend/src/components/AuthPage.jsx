@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithRedirect,
+  signInWithPopup,
   GoogleAuthProvider,
   sendEmailVerification,
 } from "firebase/auth";
@@ -25,7 +25,7 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
-     await signInWithRedirect(auth, provider);
+     await signInWithPopup(auth, provider);
       navigate(from);
     } catch (err) {
       alert(`Google sign-in failed: ${err.code}`);
@@ -41,11 +41,6 @@ const AuthPage = () => {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-
-        // Optional: send email verification
-        // await sendEmailVerification(userCredential.user);
-        // alert("Account created! Please verify your email before logging in.");
-        // return;
       }
       navigate(from);
     } catch (err) {
