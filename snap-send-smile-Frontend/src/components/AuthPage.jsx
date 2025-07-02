@@ -1,10 +1,10 @@
-// src/components/AuthPage.jsx
 import React, { useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
+  sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -17,6 +17,7 @@ const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,24 +25,33 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider);
+     await signInWithRedirect(auth, provider);
       navigate(from);
     } catch (err) {
-      alert(err.message);
+      alert(`Google sign-in failed: ${err.code}`);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, email.trim(), password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+
+        // Optional: send email verification
+        // await sendEmailVerification(userCredential.user);
+        // alert("Account created! Please verify your email before logging in.");
+        // return;
       }
       navigate(from);
     } catch (err) {
-      alert(err.message);
+      alert(`Auth failed: ${err.code}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +76,9 @@ const AuthPage = () => {
           required
         />
 
-        <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+        <button type="submit" disabled={loading || !email || !password}>
+          {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
+        </button>
 
         <p className="toggle-auth">
           {isLogin ? "Don't have an account?" : "Already registered?"}

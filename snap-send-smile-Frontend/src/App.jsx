@@ -5,73 +5,65 @@ import { useAuth } from './context/AuthContext';
 
 function App() {
   const { currentUser, signOutUser } = useAuth();
-
-  const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState(
-    localStorage.getItem("selectedFilter") || "none"
-  );
+  const [selectedFilter, setSelectedFilter] = useState(localStorage.getItem("selectedFilter") || "none");
   const [snapHistory, setSnapHistory] = useState([]);
 
-  const handleCapture = (dataURL) => {
+  const handleCapture = (snapObj) => {
+    if (!snapObj?.url || typeof snapObj.url !== 'string') return;
+
     let snapCounter = parseInt(localStorage.getItem('snapCounter') || '0', 10);
     snapCounter += 1;
     localStorage.setItem('snapCounter', snapCounter);
 
     const name = `Snap_${String(snapCounter).padStart(2, '0')}`;
-    const snapObj = {
-      name,
-      url: dataURL,
-      filter: selectedFilter
-    };
+    snapObj.name = name;
 
-    setCapturedImage(dataURL);
     setSnapHistory(prev => [snapObj, ...prev]);
   };
 
-const handleSend = async () => {
-  if (!email || snapHistory.length === 0)
-    return alert('Please enter emails and take at least one snap!');
+  const handleSend = async () => {
+    if (!email || snapHistory.length === 0) return alert('Please enter emails and take at least one snap!');
 
-  const emailList = email
-    .split(',')
-    .map(e => e.trim())
-    .filter(e => /\S+@\S+\.\S+/.test(e));
+    const emailList = email
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => /\S+@\S+\.\S+/.test(e));
 
-  if (emailList.length === 0)
-    return alert("Enter at least one valid email!");
+    if (emailList.length === 0) return alert("Enter at least one valid email!");
 
-  try {
-    setStatus('Sending...');
+    try {
+      setStatus('Sending...');
 
-    const attachments = snapHistory.map((snap) => {
-      const base64Part = typeof snap.url === 'string' && snap.url.includes('base64,')
-        ? snap.url.split('base64,')[1]
-        : null;
+      const attachments = snapHistory.map((snap) => {
+        if (typeof snap.url !== 'string' || !snap.url.includes('base64,')) return null;
+        const base64Part = snap.url.split('base64,')[1];
+        return {
+          filename: `${snap.name}${snap.url.startsWith('data:image/gif') ? '.gif' : '.png'}`,
+          content: base64Part,
+          encoding: 'base64',
+        };
+      }).filter(Boolean);
 
-      return {
-        filename: `${snap.name}${typeof snap.url === 'string' && snap.url.startsWith('data:image/gif') ? '.gif' : '.png'}` ,
-        content: base64Part,
-        encoding: 'base64',
-      };
-    }).filter(Boolean); // Remove invalid snaps
-
-    const res = await fetch('https://snap-send-smile-w2ts.onrender.com/api/send-snap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      const res = await fetch('https://snap-send-smile-w2ts.onrender.com/api/send-snap', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
       body: JSON.stringify({ emails: emailList, message, attachments }),
-    });
-
-    const data = await res.json();
-    setStatus(data.success ? '✅ All snaps sent!' : '❌ Failed to send.');
-  } catch (err) {
-    console.error(err);
-    setStatus('❌ Server error.');
-  }
-};
-
+      });
+console.log("📤 Response status:", res.status);
+      const data = await res.json();
+console.log("📤 Response data:", data);
+      setStatus(data.success ? '✅ All snaps sent!' : '❌ Failed to send.');
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Server error.');
+    }
+  };
 
   const handleLogout = () => {
     signOutUser();
@@ -84,7 +76,6 @@ const handleSend = async () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>📷 SnapSendSmile</h1>
-
       {!currentUser ? (
         <AuthPage />
       ) : (
@@ -113,10 +104,7 @@ const handleSend = async () => {
             <option value="retro">🎥 Retro VHS</option>
           </select>
 
-          <Camera
-            onCapture={handleCapture}
-            selectedFilter={selectedFilter}
-          />
+          <Camera onCapture={handleCapture} selectedFilter={selectedFilter} />
 
           <div style={{ marginTop: '20px' }}>
             <input
@@ -132,7 +120,6 @@ const handleSend = async () => {
 
             <textarea
               rows="4"
-              cols="40"
               placeholder="Enter a message to send with the snap..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -145,48 +132,42 @@ const handleSend = async () => {
           </div>
 
           <div style={{ marginTop: '30px' }}>
-  <h3>📜 Snap History</h3>
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-    {snapHistory.map((snap, idx) => {
-     const isGIF = typeof snap.url === 'string' && snap.url.startsWith('data:image/gif');
-      return (
-        <div key={idx} style={{ border: '1px solid #ccc', padding: '10px' }}>
-          <strong>{snap.name}</strong>
-          <br />
-          {isGIF ? (
-            <img
-              src={snap.url}
-              alt={snap.name}
-              width="150"
-              style={{ filter: getFilterCSS(snap.filter) }}
-            />
-          ) : (
-            <img
-              src={snap.url}
-              alt={snap.name}
-              width="150"
-              style={{ filter: getFilterCSS(snap.filter) }}
-            />
-          )}
-          <br />
-          <a
-            href={snap.url}
-            download={`${snap.name}${isGIF ? '.gif' : '.png'}`}
-            style={{ marginRight: '10px' }}
-          >
-            📥 Download
-          </a>
-          <button onClick={() => {
-            const updated = [...snapHistory];
-            updated.splice(idx, 1);
-            setSnapHistory(updated);
-          }}>❌ Delete</button>
-        </div>
-      );
-    })}
-  </div>
-</div>
-
+            <h3>📜 Snap History</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+              {snapHistory.map((snap, idx) => {
+                const isGIF = typeof snap.url === 'string' && snap.url.startsWith('data:image/gif');
+                return (
+                  <div key={idx} style={{ border: '1px solid #ccc', padding: '10px' }}>
+                    <strong>{snap.name}</strong>
+                    <br />
+                    {typeof snap.url === 'string' ? (
+                      <img
+                        src={snap.url}
+                        alt={snap.name}
+                        width="150"
+                        style={{ filter: getFilterCSS(snap.filter) }}
+                      />
+                    ) : (
+                      <p>❌ Invalid Snap Format</p>
+                    )}
+                    <br />
+                    <a
+                      href={snap.url}
+                      download={`${snap.name}${isGIF ? '.gif' : '.png'}`}
+                      style={{ marginRight: '10px' }}
+                    >
+                      📥 Download
+                    </a>
+                    <button onClick={() => {
+                      const updated = [...snapHistory];
+                      updated.splice(idx, 1);
+                      setSnapHistory(updated);
+                    }}>❌ Delete</button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </>
       )}
     </div>

@@ -4,23 +4,36 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
-app.use(cors({
+
+const corsOptions = {
   origin: [
     'https://snap-send-smile.vercel.app',
-    'http://localhost:5173'  // Allow dev environment
+    'http://localhost:5173'
   ],
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));   
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '20mb' }));
 
+// ✅ Health check
+app.get('/', (req, res) => {
+  res.send('SnapSendSmile Backend is Running ✅');
+});
 
+app.get('/', (req, res) => {
+  res.send('✅ SnapSendSmile Backend is Running!');
+});
 
+// ✅ Email Route
 app.post('/api/send-snap', async (req, res) => {
   const { emails, message, attachments } = req.body;
 
   if (!emails || !attachments || attachments.length === 0) {
-    return res.status(400).json({ success: false, msg: 'Missing fields' });
+    return res.status(400).json({ success: false, msg: 'Missing required fields.' });
   }
 
   try {
@@ -28,8 +41,8 @@ app.post('/api/send-snap', async (req, res) => {
       service: 'gmail',
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
-      },
+        pass: process.env.PASSWORD
+      }
     });
 
     for (const email of emails) {
@@ -38,22 +51,26 @@ app.post('/api/send-snap', async (req, res) => {
         to: email,
         subject: 'Here’s your Snap!',
         html: `<p>${message || 'Enjoy your photo!'}</p>`,
-        attachments: attachments.map((snap, index) => ({
-            filename: snap.filename || `snap_${index + 1}.png`,
+        attachments: attachments.map((snap, i) => {
+          const ext = snap.filename?.endsWith('.gif') ? '.gif' : '.png';
+          return {
+            filename: snap.filename || `snap_${i + 1}${ext}`,
             content: snap.content,
             encoding: 'base64',
-            contentType: 'image/png'
-          }))
+            contentType: ext === '.gif' ? 'image/gif' : 'image/png'
+          };
+        })
       });
     }
 
     res.json({ success: true, sentTo: emails.length });
   } catch (err) {
-    console.error('Email sending error:', err);
+    console.error('❌ Email send error:', err.message);
     res.status(500).json({ success: false, msg: 'Server error while sending email.' });
   }
 });
 
-
-const PORT = 5566;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+const PORT = process.env.PORT || 5566;
+app.listen(PORT, () => {
+  console.log(`🚀 SnapSendSmile Server running on http://localhost:${PORT}`);
+});
