@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import GIF from 'gif.js.optimized';
 import workerURL from '/gif.worker.js?url'; // Vite-specific import for public worker
+import "../Style/Camera.css"
 
 const Camera = ({ onCapture, selectedFilter }) => {
   const [gifURL, setGifURL] = useState(null);
@@ -50,7 +51,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
     });
 
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
@@ -143,7 +144,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d', { willReadFrequently: true });
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -205,6 +206,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
   };
 
   return (
+    <div className="camera-container">
     <div>
       <div>
         <label>📸 Select Camera: </label>
@@ -217,7 +219,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
         </select>
       </div>
 
-      <button onClick={recordGIF} disabled={isGifGenerating}>
+      <button onClick={recordGIF} style={{ cursor: 'pointer' }}  disabled={isGifGenerating}>
         🎞️ Record 2s GIF
       </button>
       {isGifGenerating && <p>⏳ Generating GIF...</p>}
@@ -237,16 +239,16 @@ const Camera = ({ onCapture, selectedFilter }) => {
       <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
 
       <div style={{ marginTop: '10px' }}>
-        <button onClick={startCountdown} disabled={countdown !== null}>
+        <button  style={{ cursor: 'pointer' }}  onClick={startCountdown} disabled={countdown !== null}>
           ⏱️ Snap in 3s
         </button>
         &nbsp;
         {recording ? (
-          <button onClick={stopRecording} style={{ color: 'red' }}>
+          <button onClick={stopRecording} style={{ color: 'red' }} >
             ⏹️ Stop Recording
           </button>
         ) : (
-          <button onClick={startRecording}>
+          <button style={{ cursor: 'pointer' }}  onClick={startRecording}>
             🎬 Start Recording
           </button>
         )}
@@ -266,6 +268,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
           </a>
         </div>
       )}
+    </div>
     </div>
   );
 };

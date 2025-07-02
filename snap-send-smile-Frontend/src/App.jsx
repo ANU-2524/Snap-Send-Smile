@@ -127,7 +127,7 @@ console.log("📤 Response data:", data);
             />
 
             <br /><br />
-            <button onClick={handleSend}>📤 Send to Email</button>
+            <button  style={{cursor:'pointer'}}   onClick={handleSend}>📤 Send to Email</button>
             <p>{status}</p>
           </div>
 
