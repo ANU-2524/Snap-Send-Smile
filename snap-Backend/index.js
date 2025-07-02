@@ -24,11 +24,7 @@ app.get('/', (req, res) => {
   res.send('SnapSendSmile Backend is Running ✅');
 });
 
-app.get('/', (req, res) => {
-  res.send('✅ SnapSendSmile Backend is Running!');
-});
 
-// ✅ Email Route
 app.post('/api/send-snap', async (req, res) => {
   const { emails, message, attachments } = req.body;
 
