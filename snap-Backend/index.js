@@ -17,12 +17,10 @@ app.use(cors({
 
 app.use(express.json({ limit: '20mb' }));
 
-// ✅ Health check route
 app.get('/', (req, res) => {
-  res.send('✅ SnapSendSmile Backend is Running!');
+  res.send('SnapSendSmile Backend is Running!');
 });
-
-// ✅ Email route
+ 
 app.post('/api/send-snap', async (req, res) => {
   const { emails, message, attachments } = req.body;
 
@@ -39,7 +37,7 @@ app.post('/api/send-snap', async (req, res) => {
       }
     });
 
-    console.log("📬 Request Received:", emails);
+    console.log("Request Received:", emails);
 
     for (const email of emails) {
       await transporter.sendMail({
@@ -65,5 +63,5 @@ app.post('/api/send-snap', async (req, res) => {
 
 const PORT = process.env.PORT || 5566;
 app.listen(PORT, () => {
-  console.log(`🚀 SnapSendSmile Server running on http://localhost:${PORT}`);
+  console.log(`SnapSendSmile Server running on http://localhost:${PORT}`);
 });

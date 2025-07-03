@@ -56,6 +56,7 @@ const AuthPage = () => {
         <h2>{isLogin ? "Login to SnapSendSmile" : "Sign Up for SnapSendSmile"}</h2>
 
         <input
+          className="auth-input"
           type="email"
           placeholder="Enter Email"
           value={email}
@@ -64,6 +65,7 @@ const AuthPage = () => {
         />
 
         <input
+          className="auth-input"
           type="password"
           placeholder="Enter Password"
           value={password}
@@ -71,7 +73,11 @@ const AuthPage = () => {
           required
         />
 
-        <button type="submit" disabled={loading || !email || !password}>
+        <button 
+          className="auth-submit" 
+          type="submit" 
+          disabled={loading || !email || !password}
+        >
           {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
         </button>
 
@@ -83,14 +89,17 @@ const AuthPage = () => {
         </p>
       </form>
 
+      <div className="divider">
+        <div className="divider-text">or</div>
+      </div>
+
       <div className="google-auth-container">
         <button className="google-btn" onClick={handleGoogleLogin}>
-          <FcGoogle size={20} style={{ marginRight: "8px" }} />
+          <FcGoogle className="google-icon" />
           Sign in with Google
         </button>
       </div>
     </div>
   );
 };
-
 export default AuthPage;

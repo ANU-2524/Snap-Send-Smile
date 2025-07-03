@@ -152,37 +152,92 @@ const Camera = ({ onCapture, selectedFilter }) => {
 
   return (
     <div className="camera-container">
-      <div>
+      <div className="camera-controls">
         <label>📱 Choose Camera: </label>
-        <select value={facingMode} onChange={(e) => setFacingMode(e.target.value)}>
+        <select 
+          className="camera-select"
+          value={facingMode} 
+          onChange={(e) => setFacingMode(e.target.value)}
+        >
           <option value="user">Front (Selfie)</option>
           <option value="environment">Back</option>
         </select>
 
-        <button onClick={recordGIF} disabled={isGifGenerating}>🎞️ Record 2s GIF</button>
-        {isGifGenerating && <p>⏳ Generating GIF...</p>}
+        <button 
+          className="camera-btn"
+          onClick={recordGIF} 
+          disabled={isGifGenerating}
+        >
+          🎞️ Record 2s GIF
+        </button>
+      </div>
 
-        <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', maxWidth: '500px', filter: getFilterCSS(selectedFilter), marginTop: '10px' }} />
-        <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+      {isGifGenerating && (
+        <p className="status-indicator">⏳ Generating GIF...</p>
+      )}
 
-        <div style={{ marginTop: '10px' }}>
-          <button onClick={startCountdown} disabled={countdown !== null}>⏱️ Snap in 3s</button>&nbsp;
-          {recording ? (
-            <button onClick={stopRecording} style={{ color: 'red' }}>⏹️ Stop Recording</button>
-          ) : (
-            <button onClick={startRecording}>🎬 Start Recording</button>
-          )}
-          {countdown && <p>⏳ Snapping in {countdown}...</p>}
-        </div>
+      <div className="camera-view">
+        {countdown && (
+          <div className="countdown-display">{countdown}</div>
+        )}
+        <video 
+          ref={videoRef} 
+          autoPlay 
+          playsInline 
+          muted 
+          style={{ 
+            width: '100%', 
+            filter: getFilterCSS(selectedFilter) 
+          }} 
+        />
+      </div>
+      
+      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
 
-        {recordedVideoURL && (
-          <div style={{ marginTop: '20px' }}>
-            <h4>🎥 Recorded Video:</h4>
-            <video src={recordedVideoURL} controls style={{ width: '100%', maxWidth: '500px' }} />
-            <a href={recordedVideoURL} download="recorded-video.webm">📥 Download Video</a>
-          </div>
+      <div className="camera-controls" style={{ marginTop: '25px' }}>
+        <button 
+          className="camera-btn"
+          onClick={startCountdown} 
+          disabled={countdown !== null}
+        >
+          ⏱️ Snap in 3s
+        </button>
+        
+        {recording ? (
+          <button 
+            className="camera-btn"
+            onClick={stopRecording}
+            style={{ background: 'rgba(255, 0, 0, 0.1)', color: 'red' }}
+          >
+            <span className="recording-indicator"></span>⏹️ Stop Recording
+          </button>
+        ) : (
+          <button 
+            className="camera-btn"
+            onClick={startRecording}
+          >
+            🎬 Start Recording
+          </button>
         )}
       </div>
+
+      {recordedVideoURL && (
+        <div className="recorded-video-container">
+          <h4>🎥 Recorded Video:</h4>
+          <video 
+            className="recorded-video"
+            src={recordedVideoURL} 
+            controls 
+          />
+          <a 
+            className="download-link"
+            href={recordedVideoURL} 
+            download="recorded-video.webm"
+          >
+            📥 Download Video
+          </a>
+        </div>
+      )}
     </div>
   );
 };
