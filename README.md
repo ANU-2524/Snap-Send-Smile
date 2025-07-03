@@ -1,83 +1,94 @@
-SnapSendSmile – Full Features Plan
-✅ Phase 1: Core MVP
-🎯 Goal: Basic working version with photo capture and email sending.
+# 📸 SnapSendSmile 💌
 
- Access device camera (HTML5 getUserMedia)
+> **Capture Moments. Add Magic. Send Smiles.**  
+SnapSendSmile is a fun, filter-rich, and user-friendly web app that lets you **capture selfies**, **apply cool filters**, **create GIFs**, and **instantly email** them to your friends or loved ones. Whether it's a moment of joy, a funny face, or a cute gesture — Snap, Smile, Send!
 
- Capture image using a “Snap” button (Canvas API)
+---
 
- Show a preview of the captured image
+## 🌐 Live Demo
 
- Ask user to enter:
+👉 Try it now: [https://snap-send-smile.vercel.app/](https://snap-send-smile.vercel.app/)  
+*(Works best on Chrome & Firefox with webcam access enabled)*
 
- Email
+---
 
- ✅ Custom Message
+## 🛠️ Tech Stack
 
- Send the photo + message to email via backend (Node.js + Nodemailer)
+### Frontend
+- **React.js** – Component-based UI
+- **CSS3** – Custom styling and animations
+- **gif.js.optimized** – GIF generation from live webcam
+- **Vite** – Lightning-fast React bundler
 
- Show success message or error
+### Backend
+- **Node.js** + **Express.js** – Email handling and API
+- **Nodemailer** – Send emails with snaps as attachments
+- **Render** – Backend deployment
 
-🎨 Phase 2: UI Fun + Photo Effects
-🎯 Goal: Make it more interactive and aesthetic
+### Auth
+- **Firebase Authentication** – Email/password & Google Sign-In
 
- 📸 Photo Filters before sending:
+---
 
- Grayscale
+## 📸 Core Features
 
- Sepia
+- 🎥 **Live Webcam Preview** (front/back camera toggle)
+- 🎨 **10+ Fun Filters** (grayscale, retro, comic, soft pink, etc.)
+- 🖼️ **Capture & Save Snaps**
+- 🎞️ **Record GIFs** (2s duration with effects)
+- 📨 **Send Snaps via Email** (with custom message)
+- 👨‍💻 **Firebase Auth** (Login, Sign Up, Google Sign-In)
+- 📜 **Snap History** with download & delete options
+- 💾 **Auto Snap Naming** using localStorage counter
 
- Blur
+---
 
- Contrast/brightness
+## 📂 Project Structure
 
- 👇 UI filter picker before sending the snap
+SnapSendSmile/
+├── public/
+│ └── gif.worker.js
+├── src/
+│ ├── components/
+│ │ ├── Camera.jsx
+│ │ └── AuthPage.jsx
+│ ├── context/
+│ │ └── AuthContext.jsx
+│ ├── Style/
+│ │ ├── Camera.css
+│ │ └── AuthPage.css
+│ ├── firebase.js
+│ ├── App.jsx
+│ └── main.jsx
 
- Canvas updates dynamically with selected filter
 
-💾 Phase 3: Photo History (Local)
-🎯 Goal: Keep track of user snaps in the browser
+---
 
- Save photos temporarily (LocalStorage / IndexedDB)
+## 🧑‍💻 How to Run Locally
 
- Show them in a gallery view
+### Prerequisites
+- Node.js ≥ 16
+- Firebase project with Auth enabled
+- Gmail or SMTP credentials for Nodemailer
 
- Option to:
+### Steps
 
- Download
+1. **Clone the repo**
+```bash
+git clone https://github.com/yourusername/SnapSendSmile.git
+cd SnapSendSmile
+npm install
 
- Delete
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
 
- Resend to someone
+EMAIL_USER=your@email.com
+EMAIL_PASS=yourpassword
 
-🔗 Phase 4: QR Code Sharing
-🎯 Goal: Share snaps easily with anyone
+npm run dev
+cd backend
+npm install
+node index.js
 
- Generate a public URL to access the snap (requires backend storage or third-party image hosting)
-
- Create a QR Code of that URL
-
- Display/share QR with the user
-
-🌞 Phase 5: Snap of the Day
-🎯 Goal: Add positivity or humor
-
- On each snap, show a random:
-
-✅ Motivational quote
-
-✅ Joke / Fun fact
-
- Fetch from a free API like ZenQuotes or use a local list
-
-👥 Phase 6: Multi-email Support
-🎯 Goal: Allow sending snaps to multiple people
-
- User enters multiple emails (comma-separated)
-
- Validate all emails
-
- Send to all via backend in a loop
-
- Show confirmation with success/failure for each
-
+Made with ❤️ by ANU_SONI
+If you liked this project, don't forget to ⭐ it and share your smile 😄
