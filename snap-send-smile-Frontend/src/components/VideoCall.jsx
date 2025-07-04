@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import '../Style/VideoCall.css';
 
-const socket = io("http://localhost:5566"); // ⛔ Use deployed URL later
+const socket = io("https://snap-send-smile-w2ts.onrender.com"); // ⛔ Use deployed URL later
 
 const VideoCall = () => {
   const { roomId } = useParams();
