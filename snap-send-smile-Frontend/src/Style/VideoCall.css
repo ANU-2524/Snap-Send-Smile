@@ -18,3 +18,39 @@
   border: 2px solid #ff7f50;
   object-fit: cover;
 }
+
+.status-text {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 15px;
+  color: #444;
+}
+
+.controls {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.controls button {
+  background-color: #ff7f50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  margin: 0 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.controls button:hover {
+  background-color: #e6683d;
+}
+
+.controls .end-call {
+  background-color: #dc3545;
+}
+
+.controls .end-call:hover {
+  background-color: #c82333;
+}
