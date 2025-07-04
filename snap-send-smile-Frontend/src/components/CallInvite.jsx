@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import '../Style/CallInvite.css'; 
+import { useNavigate } from 'react-router-dom';
 
 const CallInvite = () => {
+  const navigate = useNavigate();
   const [friendEmail, setFriendEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
@@ -23,6 +25,7 @@ const CallInvite = () => {
 
       if (res.data.success) {
         setMessage("Invitation sent successfully! ✅");
+         navigate(`/call/${roomId}`);
       } else {
         setMessage("Failed to send invitation. ❌");
       }
