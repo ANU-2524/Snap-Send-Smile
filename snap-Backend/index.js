@@ -26,7 +26,7 @@ const io = new Server(server, {
 // ✅ Initialize socket events
 io.on('connection', (socket) => {
   console.log('🔌 A user connected:', socket.id);
-  socketHandler(socket, io); // 👈 Pass both socket + io to handler
+  socketHandler(socket, io); // ✅ PASS socket + io (not wrapping connection again)
 });
 
 app.use(cors({
