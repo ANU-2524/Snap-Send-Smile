@@ -1,9 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
+const sendCallInviteRoute = require("./routes/send-call-invite");
+const socketHandler = require('./utils/socketHandler'); // ✅ <-- Import your socket logic
+
 const app = express();
+const server = http.createServer(app); // ✅ Create HTTP server for both Express + Socket.IO
+
+// ✅ Create and configure Socket.IO server
+const io = new Server(server, {
+  cors: {
+    origin: [
+      'http://localhost:5173',
+      'https://snap-send-smile.vercel.app'
+    ],
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// ✅ Initialize socket events
+io.on('connection', (socket) => {
+  console.log('🔌 A user connected:', socket.id);
+  socketHandler(socket, io); // 👈 Pass both socket + io to handler
+});
 
 app.use(cors({
   origin: [
@@ -17,10 +41,13 @@ app.use(cors({
 
 app.use(express.json({ limit: '20mb' }));
 
+// ✅ Routes
+app.use('/api', sendCallInviteRoute);
+
 app.get('/', (req, res) => {
   res.send('SnapSendSmile Backend is Running!');
 });
- 
+
 app.post('/api/send-snap', async (req, res) => {
   const { emails, message, attachments } = req.body;
 
@@ -62,6 +89,6 @@ app.post('/api/send-snap', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5566;
-app.listen(PORT, () => {
-  console.log(`SnapSendSmile Server running on http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 SnapSendSmile Server running on http://localhost:${PORT}`);
 });

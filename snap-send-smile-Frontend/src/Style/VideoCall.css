@@ -1,0 +1,20 @@
+.video-call-room {
+  text-align: center;
+  padding: 2rem;
+  background: #fefefe;
+}
+
+.video-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.video {
+  width: 400px;
+  height: 300px;
+  border-radius: 12px;
+  border: 2px solid #ff7f50;
+  object-fit: cover;
+}

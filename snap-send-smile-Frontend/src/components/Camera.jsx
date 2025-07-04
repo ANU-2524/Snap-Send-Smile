@@ -23,7 +23,7 @@ const Camera = ({ onCapture, selectedFilter }) => {
     }
 
     const constraints = {
-      video: { facingMode: { ideal: facing } }, // ✅ ideal instead of exact
+      video: { facingMode: { ideal: facing } }, 
       audio: true,
     };
 
