@@ -8,21 +8,17 @@ const socket = io("https://snap-send-smile-w2ts.onrender.com");
 
 const VideoCall = () => {
   const { roomId } = useParams();
-  const navigate = useNavigate();
-
   const userVideo = useRef();
   const partnerVideo = useRef();
   const peerRef = useRef();
   const streamRef = useRef();
+  const navigate = useNavigate();
 
-  const [statusMessage, setStatusMessage] = useState("Waiting for your friend to join...");
-  const [callStarted, setCallStarted] = useState(false);
+  const [waiting, setWaiting] = useState(true);
   const [micOn, setMicOn] = useState(true);
-  const [cameraOn, setCameraOn] = useState(true);
+  const [camOn, setCamOn] = useState(true);
 
   useEffect(() => {
-    let timeout;
-
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
       userVideo.current.srcObject = stream;
       streamRef.current = stream;
@@ -32,25 +28,20 @@ const VideoCall = () => {
       socket.on("other-user", (userId) => {
         const peer = createPeer(userId, socket.id, stream);
         peerRef.current = peer;
+        setWaiting(false);
       });
 
       socket.on("user-joined", (userId) => {
         const peer = addPeer(userId, stream);
         peerRef.current = peer;
+        setWaiting(false);
       });
 
       socket.on("signal", (payload) => {
-        peerRef.current.signal(payload.signal);
-        setStatusMessage(""); // Friend joined
-        setCallStarted(true);
-        clearTimeout(timeout);
-      });
-
-      timeout = setTimeout(() => {
-        if (!callStarted) {
-          setStatusMessage("👻 Your friend didn’t join within 4 minutes.");
+        if (peerRef.current) {
+          peerRef.current.signal(payload.signal);
         }
-      }, 4 * 60 * 1000); // 4 minutes
+      });
     });
 
     return () => {
@@ -96,15 +87,19 @@ const VideoCall = () => {
   };
 
   const toggleMic = () => {
-    const audioTrack = streamRef.current.getAudioTracks()[0];
-    audioTrack.enabled = !micOn;
-    setMicOn(!micOn);
+    const audioTrack = streamRef.current?.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      setMicOn(audioTrack.enabled);
+    }
   };
 
-  const toggleCamera = () => {
-    const videoTrack = streamRef.current.getVideoTracks()[0];
-    videoTrack.enabled = !cameraOn;
-    setCameraOn(!cameraOn);
+  const toggleCam = () => {
+    const videoTrack = streamRef.current?.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      setCamOn(videoTrack.enabled);
+    }
   };
 
   const endCall = () => {
@@ -120,19 +115,17 @@ const VideoCall = () => {
         <video className="video" ref={userVideo} autoPlay muted />
         <video className="video" ref={partnerVideo} autoPlay />
       </div>
-
-      {statusMessage && <p className="status-text">{statusMessage}</p>}
-
+      <p className="status-message">
+        {waiting ? "Waiting for your friend to join..." : "You're connected! 🎉"}
+      </p>
       <div className="controls">
         <button onClick={toggleMic}>
-          {micOn ? "Mute Mic 🔇" : "Unmute Mic 🎤"}
+          {micOn ? "Mute Mic 🎙️" : "Unmute Mic 🔇"}
         </button>
-        <button onClick={toggleCamera}>
-          {cameraOn ? "Turn Off Camera 📷❌" : "Turn On Camera 📷✅"}
+        <button onClick={toggleCam}>
+          {camOn ? "Turn Off Camera 📷❌" : "Turn On Camera 📷✅"}
         </button>
-        <button onClick={endCall} className="end-call">
-          End Call ❌
-        </button>
+        <button onClick={endCall} className="end-call">End Call ❌</button>
       </div>
     </div>
   );
