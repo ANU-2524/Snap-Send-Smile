@@ -17,7 +17,7 @@
 }
 
 .call-invite-container button {
-  background: #ff7f50;
+  background: #a46f2a;
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -27,7 +27,7 @@
 }
 
 .call-invite-container button:hover {
-  background: #ff6333;
+  background: #5d3b05;
 }
 
 .status-message {
