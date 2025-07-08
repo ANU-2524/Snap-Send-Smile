@@ -21,7 +21,7 @@ const Header = ({ user, onLogout }) => (
       </div>
       <div className="user-info">
         <div className="user-email">{user.email}</div>
-        <div className="user-status">Premium Member</div>
+        {/* <div className="user-status">Premium Member</div> */}
       </div>
       <button className="logout-btn" onClick={onLogout}>
         <span>Logout</span>
@@ -202,7 +202,7 @@ const VideoCallSection = () => (
   <div className="video-call-section">
     <div className="section-header">
       <h3 className="section-title">Invite Friend to a Video Call</h3>
-      <div className="section-subtitle">Premium video experience</div>
+      {/* <div className="section-subtitle">Premium video experience</div> */}
     </div>
     <CallInvite />
   </div>
