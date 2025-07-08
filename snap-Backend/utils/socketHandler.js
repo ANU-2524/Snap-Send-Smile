@@ -3,30 +3,34 @@ let rooms = {}; // Track participants per room
 function socketHandler(socket, io) {
   console.log(`📡 User connected: ${socket.id}`);
 
+  // ✅ Join room
   socket.on("join-room", (roomId) => {
     if (!rooms[roomId]) rooms[roomId] = [];
-    rooms[roomId].push(socket.id);
+
+    if (!rooms[roomId].includes(socket.id)) {
+      rooms[roomId].push(socket.id);
+    }
 
     const otherUser = rooms[roomId].find(id => id !== socket.id);
     if (otherUser) {
-      socket.emit("other-user", otherUser);            // Tell new user about existing
-      socket.to(otherUser).emit("user-joined", socket.id); // Tell existing about new user
+      socket.emit("other-user", otherUser);
+      socket.to(otherUser).emit("user-joined", socket.id);
     }
 
-    socket.roomId = roomId; // Track room on socket
+    socket.roomId = roomId;
   });
 
-  // Offer
+  // ✅ Handle offer (caller)
   socket.on("sending-signal", ({ userToSignal, callerId, signal }) => {
     io.to(userToSignal).emit("signal", { signal, callerId });
   });
 
-  // Answer
+  // ✅ Handle answer (callee)
   socket.on("returning-signal", ({ signal, to }) => {
     io.to(to).emit("signal", { signal, callerId: socket.id });
   });
 
-  // Disconnect
+  // ✅ Clean up on disconnect
   socket.on("disconnect", () => {
     console.log(`❌ Disconnected: ${socket.id}`);
     const roomId = socket.roomId;
