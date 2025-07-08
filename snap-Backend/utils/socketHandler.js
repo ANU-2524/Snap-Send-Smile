@@ -31,7 +31,7 @@ function socketHandler(socket, io) {
   });
 
   // ✅ Clean up on disconnect
-  socket.on("disconnect", () => {
+  socket.on("disconnect", () =>  {
     console.log(`❌ Disconnected: ${socket.id}`);
     const roomId = socket.roomId;
     if (roomId && rooms[roomId]) {
