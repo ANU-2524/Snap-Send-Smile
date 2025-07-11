@@ -131,7 +131,7 @@ const VideoCall = () => {
       </p>
       <div className="controls">
         <button onClick={toggleMic}>
-          {micOn ? "Mute Mic 🎙️" : "Unmute Mic 🔇"}
+          {micOn ? "Mute Mic 🎙️" : "Unmute Mic 🔇" }
         </button>
         <button onClick={toggleCam}>
           {camOn ? "Turn Off Camera 📷❌" : "Turn On Camera 📷✅"}
